@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shiroo Elite Dashboard</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    background:#08090d;
+    color:#f5f7fa;
+    min-height:100vh;
+  }
+  .app{max-width:760px;margin:auto;padding:18px 16px 40px}
+  .topbar{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:8px 2px 18px;border-bottom:1px solid #202126;margin-bottom:22px
+  }
+  .profile{display:flex;align-items:center;gap:12px}
+  .avatar{
+    width:44px;height:44px;border-radius:50%;
+    display:grid;place-items:center;font-size:23px;font-weight:800;
+    background:linear-gradient(145deg,#05b8e9,#0570c9)
+  }
+  .name{font-size:16px;font-weight:750}.email{font-size:12px;color:#8f929b;margin-top:2px}
+  .logout{color:#b8bbc4;font-size:22px}
+  .balance{
+    background:linear-gradient(135deg,#087cf1,#09c2d7);
+    border-radius:28px;padding:28px 28px 30px;
+    box-shadow:0 16px 40px rgba(0,130,255,.12)
+  }
+  .label{font-size:13px;color:#d8efff;font-weight:700;letter-spacing:.3px}
+  .money{font-size:42px;font-weight:850;margin:6px 0}
+  .sub{color:#d5efff;font-size:15px}.sub b{color:#fff}
+  .balance-actions{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:26px}
+  button{
+    border:0;color:#fff;font:inherit;font-weight:750;cursor:pointer;
+    transition:.2s transform,.2s opacity
+  }
+  button:active{transform:scale(.98)}
+  .balance button{
+    padding:16px;border-radius:18px;background:rgba(255,255,255,.18)
+  }
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:20px}
+  .tile{
+    min-height:120px;border:1px solid #292a2f;border-radius:24px;
+    background:#15161a;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:10px;color:#d7d9de
+  }
+  .tile:nth-child(n+5){min-height:108px}
+  .tile-icon{
+    width:54px;height:54px;border-radius:17px;background:#073843;
+    display:grid;place-items:center;font-size:25px;color:#5de7f5
+  }
+  .tile span:last-child{font-size:13px;font-weight:700}
+  .soon{
+    position:absolute;top:7px;right:7px;background:#5d4b00;
+    color:#ffe66d;border-radius:8px;padding:3px 6px;font-size:9px;font-weight:800
+  }
+  .tile{position:relative}
+  .stats{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px}
+  .card{
+    background:#15161a;border:1px solid #292a2f;border-radius:25px;padding:22px;
+  }
+  .stat-icon{width:45px;height:45px;border-radius:14px;background:#10352d;display:grid;place-items:center;margin-bottom:15px;color:#57f1c0}
+  .yellow{background:#352b16;color:#ffd44f}.red{background:#351a21;color:#ff9baa}.cyan{background:#10333c;color:#59e7f4}
+  .stat-title{color:#9a9da6;font-size:14px}.stat-value{font-size:23px;font-weight:850;margin-top:7px}
+  .section{margin-top:20px;background:#15161a;border:1px solid #292a2f;border-radius:25px;padding:22px 24px}
+  .section-head{display:flex;justify-content:space-between;align-items:center}
+  .section h3{font-size:18px}.badge{background:#0b493b;color:#64edc0;padding:5px 11px;border-radius:12px;font-size:12px;font-weight:800}
+  .progress{height:13px;background:#25262b;border-radius:99px;margin-top:25px;overflow:hidden}
+  .progress>div{height:100%;width:100%;background:#06d39a;border-radius:99px}
+  .percent{text-align:right;font-weight:800;margin-top:9px}
+  .limitbar{height:12px;background:#27282d;border-radius:99px;margin-top:22px}
+  .limitbar>div{height:100%;width:0;background:#18c6dd;border-radius:99px}
+  .limit-row{display:flex;justify-content:space-between;margin-top:12px;color:#aaaeb8;font-size:14px}
+  .limit-row b{color:#fff}
+  .toast{
+    position:fixed;left:50%;bottom:25px;transform:translate(-50%,20px);
+    background:#202228;border:1px solid #3a3c43;padding:12px 18px;border-radius:14px;
+    opacity:0;pointer-events:none;transition:.25s;box-shadow:0 10px 30px #0008
+  }
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+  @media(max-width:560px){
+    .grid{grid-template-columns:repeat(4,1fr);gap:8px}
+    .tile{min-height:116px;border-radius:20px}
+    .tile-icon{width:48px;height:48px}
+    .tile span:last-child{font-size:12px}
+    .money{font-size:38px}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="profile">
+      <div class="avatar">ϟ</div>
+      <div><div class="name">Shiroo Elite</div><div class="email">user@example.com</div></div>
+    </div>
+    <button class="logout" onclick="showToast('Menu akun dibuka')">⇥</button>
+  </header>
+
+  <section class="balance">
+    <div class="label">SALDO ANDA</div>
+    <div class="money" id="balance">Rp 0</div>
+    <div class="sub">Harga per item: <b>Rp 5.000</b></div>
+    <div class="balance-actions">
+      <button onclick="showToast('Fitur tarik saldo dipilih')">Tarik Saldo</button>
+      <button onclick="showToast('Membuka riwayat penarikan')">Riwayat Penarikan</button>
+    </div>
+  </section>
+
+  <div class="grid">
+    <button class="tile" onclick="showToast('Halaman Stor')"><div class="tile-icon">⇧</div><span>Stor</span></button>
+    <button class="tile" onclick="showToast('Halaman Riwayat')"><div class="tile-icon">◷</div><span>Riwayat</span></button>
+    <button class="tile" onclick="showToast('Halaman Saldo')"><div class="tile-icon">☷</div><span>Saldo</span></button>
+    <button class="tile" onclick="showToast('Membuka Rules')"><div class="tile-icon">▤</div><span>Rules</span></button>
+    <button class="tile" onclick="showToast('Leaderboard belum tersedia')"><div class="tile-icon" style="background:#202126;color:#bbb">♜</div><span>Leaderboard</span></button>
+    <button class="tile" onclick="showToast('Laporan segera hadir')"><i class="soon">SOON</i><div class="tile-icon" style="background:#202126;color:#bbb">▥</div><span>Laporan</span></button>
+    <button class="tile" onclick="showToast('Support segera hadir')"><i class="soon">SOON</i><div class="tile-icon" style="background:#202126;color:#bbb">?</div><span>Support</span></button>
+  </div>
+
+  <div class="stats">
+    <div class="card"><div class="stat-icon">●</div><div class="stat-title">Diterima</div><div class="stat-value">0</div></div>
+    <div class="card"><div class="stat-icon yellow">●</div><div class="stat-title">Pending</div><div class="stat-value">0</div></div>
+    <div class="card"><div class="stat-icon red">●</div><div class="stat-title">Ditolak</div><div class="stat-value">0</div></div>
+    <div class="card"><div class="stat-icon cyan">●</div><div class="stat-title">Harga per item</div><div class="stat-value">Rp 5.000</div></div>
+  </div>
+
+  <section class="section">
+    <div class="section-head"><h3>Kualitas Akun</h3><span class="badge">Baik</span></div>
+    <div class="progress"><div></div></div>
+    <div class="percent">100%</div>
+  </section>
+
+  <section class="section">
+    <h3>Limit Hari Ini</h3>
+    <div class="limitbar"><div id="limitProgress"></div></div>
+    <div class="limit-row"><b id="limitText">0 / 100 item</b><span id="remaining">Sisa 100 item</span></div>
+  </section>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  function showToast(text){
+    const t=document.getElementById('toast');
+    t.textContent=text;t.classList.add('show');
+    clearTimeout(window.toastTimer);
+    window.toastTimer=setTimeout(()=>t.classList.remove('show'),1800);
+  }
+  // Contoh data dinamis. Ubah angka ini untuk mengisi dashboard.
+  const processed=0, dailyLimit=100;
+  document.getElementById('limitProgress').style.width=(processed/dailyLimit*100)+'%';
+  document.getElementById('limitText').textContent=`${processed} / ${dailyLimit} item`;
+  document.getElementById('remaining').textContent=`Sisa ${dailyLimit-processed} item`;
+</script>
+</body>
+</html>
